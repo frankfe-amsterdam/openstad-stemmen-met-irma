@@ -1,0 +1,18 @@
+version: "3.5"
+services:
+  fe:
+    container_name: irma_vote_fe
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend:/usr/src/app
+  be:
+    container_name: irma_vote_be
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "4444:4444"
+    volumes:
+      - ./backend:/usr/src/app

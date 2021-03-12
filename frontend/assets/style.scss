@@ -1,0 +1,40 @@
+//@import "fonts.scss";
+$fa-font-path: '~@fortawesome/fontawesome-free/webfonts';
+@import '~@fortawesome/fontawesome-free/scss/fontawesome.scss';
+@import '~@fortawesome/fontawesome-free/scss/regular.scss';
+@import '~@fortawesome/fontawesome-free/scss/solid.scss';
+
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins';
+@import '~bootstrap/scss/bootstrap.scss';
+
+@import '~@privacybydesign/irma-css';
+
+// RU colors:
+$ru-color1: #e3000b;
+$ru-color2: #8f2011;
+$ru-color3: #4a0004;
+$ru-color4: #730e04;
+
+$primary: #07b;
+$primary: #e3000b;
+$card-cap-bg: rgba(255, 255, 255, 0.1);
+//$body-bg: #e9ecef;
+$body-bg: #f5f5f5;
+//$headings-color: #4a0004;
+$card-cap-color: white;
+$card-cap-bg: #8f2011;
+$progress-bg: #888;
+
+header {
+  background-color: $ru-color2;
+}
+
+ol.breadcrumb {
+  background-color: $ru-color2;
+  color: $body-bg;
+  .breadcrumb-item.active {
+    color: $body-bg;
+  }
+}

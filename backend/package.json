@@ -1,0 +1,22 @@
+{
+  "name": "backend",
+  "version": "0.0.1",
+  "description": "backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "start_irma_server": "irma server --config ./config/irmaconf.json"
+  },
+  "author": "Frank (f.filius@amsterdam.nl)",
+  "license": "ISC",
+  "dependencies": {
+    "@privacybydesign/irma-backend": "^0.1.4",
+    "better-sqlite3": "^7.1.2",
+    "cookie-session": "^1.4.0",
+    "express": "^4.17.1",
+    "express-mung": "^0.5.1",
+    "http-proxy-middleware": "^1.0.6",
+    "node-fetch": "^2.6.1",
+    "nodemon": "^2.0.7"
+  }
+}
