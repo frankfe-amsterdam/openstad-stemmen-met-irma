@@ -1,28 +1,31 @@
-# Build client frontend
-FROM node:15.11.0-alpine3.13 AS builder
+FROM node:15.11.0
 LABEL maintainer="datapunt@amsterdam.nl"
 
-ENV NODE_ENV=${ENVIRONMENT}
-ENV PATH /app/node_modules/.bin:$PATH
+WORKDIR /app/frontend
+COPY ./frontend/webpack.config.js ./
+COPY ./frontend/package.json ./
+COPY ./frontend/package-lock.json ./
+COPY ./frontend/src ./src
 
-WORKDIR /app
-COPY ./frontend ./
-COPY ./backend ./backend
+WORKDIR /app/backend
+COPY ./backend/package.json ./
+COPY ./backend/package-lock.json ./
+COPY ./backend/src ./src
 
-RUN cd frontend && yarn install
+## Build the frontend (output will be in backend/public)
+WORKDIR /app/frontend
+RUN npm install && npm run build
 
-RUN yarn build
+WORKDIR /app/backend
+RUN npm install --production
 
-# Build server and include frontend (docroot is set to ../client in config.json)
-FROM node:14.4-alpine3.12
+## Remove frontend
+WORKDIR /app/
+RUN rm -rf frontend
 
-ENV NODE_EXTRA_CA_CERTS=/adp_rootca.crt
-COPY adp_rootca.crt /adp_rootca.crt
+## Install pm2-runtime
+RUN npm install pm2 -g
+WORKDIR /app/backend
+CMD ["pm2-runtime","./src/server.js"]
 
-COPY ./backend /backend
-WORKDIR /backend
-RUN yarn install
-
-CMD ["npx", "nodemon", "index.js", "--verbose"]
-
-EXPOSE 8000
+EXPOSE 4444

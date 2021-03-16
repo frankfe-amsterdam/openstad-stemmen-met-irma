@@ -1,5 +1,5 @@
-require('../node_modules/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css');
-require('../node_modules/bootstrap-table/dist/bootstrap-table.min.css');
+require('bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css');
+require('bootstrap-table/dist/bootstrap-table.min.css');
 require('../assets/style.scss');
 require('bootstrap-datepicker');
 require('bootstrap-table');

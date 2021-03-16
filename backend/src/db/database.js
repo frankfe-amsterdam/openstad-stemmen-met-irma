@@ -1,9 +1,10 @@
 const sqlite3 = require('better-sqlite3')
 
-const conf = require('./../config/conf.json')
+const conf = require('../config/conf.json')
+const path = require('path');
 
 // Connect to the database and initialize it
-let db = new sqlite3(conf.database_file)
+let db = new sqlite3(path.join(process.cwd(), conf.database_file));
 
 // Create a table and insert initial count
 db.transaction(() => {

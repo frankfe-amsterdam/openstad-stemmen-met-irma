@@ -1,5 +1,5 @@
 require('../assets/style.scss');
-require('../node_modules/bootstrap-table/dist/bootstrap-table.min.css');
+require('bootstrap-table/dist/bootstrap-table.min.css');
 require('bootstrap-table');
 require('jquery-form');
 

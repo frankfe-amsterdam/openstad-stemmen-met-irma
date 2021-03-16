@@ -12,6 +12,8 @@ const election = require('./routes/election')
 const db = require('./db/database')
 const conf = require('./config/config')
 
+const path = require('path');
+
 const app = express()
 
 // First define the proxies,
@@ -50,7 +52,7 @@ app.use('/api/v1/votingcard', votingcard)
 app.use('/api/v1/election', election)
 
 // Serve static public directory (frontend for now)
-app.use(express.static('public', { extensions: ['html'] }))
+app.use(express.static(path.join(__dirname, '../public'), { extensions: ['html'] }))
 
 const server = app.listen(conf.port, conf.listen, () =>
   console.log(

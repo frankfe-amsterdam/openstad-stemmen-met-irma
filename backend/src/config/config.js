@@ -1,5 +1,5 @@
 const { networkInterfaces } = require('os')
-var conf = require('./../config/conf.json')
+var conf = require('./conf.json')
 
 // validates the configuration read from file
 // throws err if the validation is not sufficient to run the server.

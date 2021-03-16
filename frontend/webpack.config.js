@@ -57,10 +57,10 @@ var config = {
 var serverAConfig = Object.assign({}, config, {
     name: 'serverA',
     entry: {
-        userIndex: './user/index.js',
-        adminIndex: './admin/index.js',
-        login: './admin/login.js',
-        election: './admin/election.js'
+        userIndex: './src/user/index.js',
+        adminIndex: './src/admin/index.js',
+        login: './src/admin/login.js',
+        election: './src/admin/election.js'
     },
     output: {
         path: outputA,
@@ -71,25 +71,28 @@ var serverAConfig = Object.assign({}, config, {
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             filename: 'index.html',
-            template: './user/index.html',
+            template: './src/user/index.html',
             chunks: ['userIndex']
         }),
         new HtmlWebpackPlugin({
             filename: 'admin/index.html',
-            template: './admin/index.html',
+            template: './src/admin/index.html',
             chunks: ['adminIndex']
         }),
         new HtmlWebpackPlugin({
             filename: 'admin/login.html',
-            template: './admin/login.html',
+            template: './src/admin/login.html',
             chunks: ['login']
         }),
         new HtmlWebpackPlugin({
             filename: 'admin/election.html',
-            template: './admin/election.html',
+            template: './src/admin/election.html',
             chunks: ['election']
         })
-    ])
+    ]),
+    resolve: {
+        modules: [path.resolve(__dirname, 'node_modules'), 'node_modules']
+      }
 });
 
 module.exports = [serverAConfig];

@@ -4,7 +4,7 @@
   "description": "backend",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "nodemon src/server.js",
     "start_irma_server": "irma server --config ./config/irmaconf.json"
   },
   "author": "Frank (f.filius@amsterdam.nl)",

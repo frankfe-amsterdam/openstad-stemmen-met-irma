@@ -7,7 +7,7 @@
   "external_url_disabled": "https://election-register.sustainablesoftware.info",
   "listen": "0.0.0.0",
   "port": 4444,
-  "database_file": "./db/database.db",
+  "database_file": "./src/db/database.db",
   "vote_url_disabled": "https://election-vote.sustainablesoftware.info",
   "vote_port": 4445,
   "admins": [
