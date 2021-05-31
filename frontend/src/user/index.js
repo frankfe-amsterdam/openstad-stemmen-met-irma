@@ -132,6 +132,7 @@ const removeWithHelpClassIfPresent = () => {
 
 const createFinalScreen = () => {
     cardEl.classList.add('final');
+    removeWithHelpClassIfPresent();
     const titleHTML = "<section class='title'><h1>Gelukt!</h1></section>";
     const paragraphHTML = `<section class="final__paragraph"><p>U kunt stemmen tot en met juni 2021</p></section>`;
     const linkHTML = `<section class="final__button"><a class='linkBtn' href="${OPENSTAD_URL}">Naar stem website</a></section>`;
