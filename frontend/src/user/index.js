@@ -282,17 +282,6 @@ const fetchElectionData = () => {
         .catch(onFail);
 };
 
-const createRemoveVotingCardsButton = () => {
-    const buttonEl = document.createElement('button');
-    buttonEl.innerText = 'Verwijder personen';
-    buttonEl.addEventListener('click', () => {
-        fetch(`/api/v1/admin/1/deleteAll`, { method: 'DELETE' }).then(res => {
-            if (res.status === 204) console.log('deleted retrievals');
-        });
-    });
-    document.querySelector('header').appendChild(buttonEl);
-};
-
 const init = () => {
     cardEl = document.querySelector('.card');
     titleEl = document.querySelector('h1');
@@ -300,7 +289,6 @@ const init = () => {
     contentBodyEl = document.querySelector('.content__info__body');
     checkIfMobileAndSetClass();
     setEventListeners();
-    createRemoveVotingCardsButton();
     fetchElectionData();
 };
 
