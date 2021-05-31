@@ -2,22 +2,14 @@
   "production": false,
   "url": "",
   "port": 8089,
-  "DisableTLS": true,
+  "sse": true,
   "email": "f.filius@amsterdam.nl",
-  "disclose_perms": [],
+  "disclose_perms": [
+    "irma-demo.gemeente.personalData.*",
+    "irma-demo.gemeente.address.zipcode",
+    "pbdf.sidn-pbdf.email.email"
+  ],
+  "issue_perms": ["irma-demo.stemmen.stempas"],
   "sign_perms": [],
-  "issue_perms": [],
-  "no_auth": false,
-  "requestors": {
-    "serverA": {
-      "auth_method": "token",
-      "key": "8OC9rOOdkVOLel5vO61",
-      "disclose_perms": [
-        "irma-demo.gemeente.personalData.*",
-        "pbdf.sidn-pbdf.email.email"
-      ],
-      "issue_perms": ["irma-demo.stemmen.stempas"],
-      "sign_perms": []
-    }
-  }
+  "no_auth": true
 }

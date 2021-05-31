@@ -1,7 +1,6 @@
 {
   "irma": {
-    "url": "http://localhost:8089",
-    "auth_token": "8OC9rOOdkVOLel5vO61"
+    "url": "http://localhost:8089"
   },
   "mode": "dev",
   "external_url_disabled": "https://election-register.sustainablesoftware.info",

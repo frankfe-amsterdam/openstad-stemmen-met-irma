@@ -1,14 +1,99 @@
-const irma = require('@privacybydesign/irma-frontend');
-const style = require('../assets/style.scss');
+import IrmaCore from '@privacybydesign/irma-core';
+import Web from '@privacybydesign/irma-web';
+import Client from '@privacybydesign/irma-client';
+import '@privacybydesign/irma-css';
+import './style.scss';
 
-// If this gets any more complicated whe should use a state machine
+const OPENSTAD_URL = 'https://irmapilot.cms.special-branch.openstad.amsterdam/';
+let cardEl;
+let titleEl;
+let contentInfoEl;
+let contentBodyEl;
+let activeStep = 1;
 
-const step1 = `Om te kunnen stemmen wordt eerst met IRMA uw identiteit vastgesteld. Dit voorkomt dubbel stemmen. U kunt daarna een anonieme niet-traceerbare stemkaart in uw IRMA app laden. Daarna kunt u op een andere website deze stemkaart inzetten om te stemmen. Doordat het stemmen op een andere website gebeurt, kunt u niet getraceerd worden en weet niemand wie de stem uitbrengt. Houd daarvoor wel uw stemkaart prive.`;
-const step2 = `Uw identiteit is vastgesteld. U mag stemmen. Um te kunnen stemmen kunt u nu een anonieme niet-traceerbare stemkaart in uw IRMA app laden. Daarna kunt u op een andere website deze stemkaart inzetten om te stemmen. Doordat het stemmen op een andere website gebeurt, kunt u niet getraceerd worden en weet niemand wie de stem uitbrengt. Houd daarvoor wel uw stemkaart prive.`;
+const userAgent = () => {
+    if (typeof window === 'undefined') return 'nodejs';
+    const navigator = window.navigator;
+
+    if (!!window.MSInputMethodContext && !!document.documentMode) return 'Desktop';
+
+    if (/Android/i.test(navigator.userAgent)) {
+        return 'Android';
+    }
+
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) return 'iOS';
+
+    if (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints && navigator.maxTouchPoints > 2) return 'iOS';
+
+    return 'Desktop';
+};
+
+const isMobile = () => {
+    return userAgent() === 'Android' || userAgent() === 'iOS';
+};
+
+class IrmaStateChangeCallback {
+    constructor({ options }) {
+        this.mapping = options.callBackMapping;
+    }
+
+    stateChange({ newState, payload }) {
+        if (Object.keys(this.mapping).indexOf(newState) !== -1 && typeof this.mapping[newState] === 'function') {
+            this.mapping[newState](payload);
+        } else if (this.mapping.rest && typeof this.mapping.rest === 'function') {
+            this.mapping.rest(payload);
+        }
+    }
+
+    close() {
+        return Promise.resolve();
+    }
+}
+
+class IrmaAbortOnCancel {
+    constructor({ stateMachine }) {
+        this.stateMachine = stateMachine;
+    }
+    stateChange({ newState }) {
+        if (newState === 'Cancelled') {
+            this.stateMachine.transition('abort');
+        }
+    }
+}
+
+const setClassToShowLogo = isSet => {
+    const irmaWebEl = document.querySelector('.irma-web-centered');
+    isSet ? irmaWebEl.classList.add('show-logo') : irmaWebEl.classList.remove('show-logo');
+};
+
+const callBackMapping = {
+    ShowingQRCode: () => {
+        setClassToShowLogo(true);
+    },
+    ShowingQRCodeInstead: () => {
+        setClassToShowLogo(true);
+    },
+    ShowingIrmaButton: () => {
+        if (document.querySelector('.irma-web-button')) {
+            document.querySelector('.irma-web-button').innerText =
+                activeStep === 1 ? 'Aanmelden met IRMA' : 'Zet stempas in IRMA';
+        }
+    },
+    Error: payload => {
+        console.log({ payload });
+    },
+    Aborted: () => {
+        onIrmaSessionAborted();
+    },
+    rest: () => {
+        setClassToShowLogo(false);
+    }
+};
 
 let options = {
     debugging: true,
-    element: '#irma-web-form',
+    element: `${isMobile() ? '#irma-web-form-mobile' : '#irma-web-form'}`,
+    callBackMapping,
     session: {
         start: {
             url: o => `${o.url}/start`,
@@ -24,63 +109,163 @@ let options = {
     }
 };
 
-function onElectionData(electionData) {
-    var irmaWeb = irma.newWeb(options);
-    irmaWeb
-        .start()
-        .then(result => {
-            // wait two seconds to display check mark
-            return new Promise(resolve => setTimeout(() => resolve(result), 2000));
-        })
-        .then(result => {
-            if (result !== 200) throw new Error('disclosure failed');
-            console.log('disclosure completed');
-            document.querySelector('#election-step').innerText = step2;
-            document.querySelector('#irma-help-text').innerText = 'Scan dan de QR code rechts om verder te gaan.';
-            document.querySelector('#irma-help-btn').remove();
-            document.querySelector('#irma-readmore-btn').remove();
-            let btn = document.querySelector('#btn-election-step2');
-            btn.className = btn.className.replace('btn-secondary', 'btn-primary');
-            options.session.url = options.session.url.replace('disclose', 'issue');
+const createIrmaSession = () => {
+    const irma = new IrmaCore(options);
 
-            irmaWeb = irma.newWeb(options);
-            irmaWeb
+    irma.use(Client);
+    irma.use(Web);
+
+    if (callBackMapping) {
+        irma.use(IrmaStateChangeCallback);
+    }
+    irma.use(IrmaAbortOnCancel);
+
+    return irma;
+};
+
+const removeWithHelpClassIfPresent = () => {
+    if (cardEl.classList.contains('with-help')) {
+        cardEl.classList.remove('with-help');
+    }
+    return cardEl;
+};
+
+const createFinalScreen = () => {
+    cardEl.classList.add('final');
+    const titleHTML = "<section class='title'><h1>Gelukt!</h1></section>";
+    const paragraphHTML = `<section class="final__paragraph"><p>U kunt stemmen tot en met juni 2021</p></section>`;
+    const linkHTML = `<section class="final__button"><a class='linkBtn' href="${OPENSTAD_URL}">Naar stem website</a></section>`;
+    cardEl.innerHTML = titleHTML + paragraphHTML + linkHTML;
+};
+
+const updateProgressBar = activeStep => {
+    const steps = [...document.querySelectorAll('.steps > span')];
+    steps.forEach((step, index) => {
+        if (activeStep === index + 1) {
+            step.classList.add('active');
+        } else {
+            step.classList.remove('active');
+            step.classList.add('done');
+        }
+    });
+};
+
+const removeButtonFromContentIfPresent = () => {
+    contentInfoEl.querySelector('button')?.remove();
+};
+
+const setStep2Content = () => {
+    removeButtonFromContentIfPresent();
+    titleEl.innerText = '2. Zet uw stempas in IRMA';
+    contentBodyEl.innerText =
+        'Scan deze QR-code om uw stempas op te halen voor ‘The best of Amsterdam Light Festival’.';
+    activeStep++;
+    updateProgressBar();
+};
+
+const showDisclosureCompleteUI = (irmaSession, result) => {
+    contentBodyEl.innerText =
+        'Gelukt! Bedankt voor uw aanmelding. U kunt nu verder gaan met de volgende stap om uw stempas in de IRMA-app te zetten.';
+    const toNextStepButton = document.createElement('button');
+    toNextStepButton.classList.add('primary-button');
+    toNextStepButton.innerText = '2. Stempas ophalen';
+    toNextStepButton.addEventListener('click', () => {
+        createIrmaIssueRequestSession(irmaSession, result);
+    });
+    contentInfoEl.appendChild(toNextStepButton);
+};
+
+const onAlreadyHaveVotingcard = () => {
+    removeWithHelpClassIfPresent();
+    cardEl.classList.add('final');
+    const titleHTML = "<section class='title'><h1>U heeft al een stempas opgehaald</h1></section>";
+    const paragraphHTML = `<section class="final__paragraph"><p>Heeft u uw stempas per ongeluk verwijderd?</p></section>`;
+    const linkHTML = `<section class="final__button"><a class='linkBtn' href="${OPENSTAD_URL}">Naar stem website</a></section>`;
+    cardEl.innerHTML = titleHTML + paragraphHTML + linkHTML;
+};
+
+const onIrmaSessionAborted = () => {
+    removeWithHelpClassIfPresent();
+    cardEl.classList.add('final');
+    const titleHTML = "<section class='title'><h1>U heeft de IRMA-sessie onderbroken</h1></section>";
+    const paragraphHTML = `<section class="final__paragraph"><p>Wilt u het nogmaals proberen?</p></section>`;
+    const linkHTML = `<section class="final__button"><a class='linkBtn' href="/">Klik dan hier</a></section>`;
+    cardEl.innerHTML = titleHTML + paragraphHTML + linkHTML;
+};
+
+const createIrmaSessionResult = url => {
+    return fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            console.log({ data });
+            return data;
+        });
+};
+
+const createIrmaIssueRequestSession = (irmaSession, disclosureResult) => {
+    if (disclosureResult !== 200) throw new Error('disclosure failed');
+    console.log('disclosure completed');
+    setStep2Content();
+    options.session.url = options.session.url.replace('disclose', 'issue');
+    options.session.start = false;
+
+    createIrmaSessionResult(options.session.url + '/start')
+        .then(disclosureResult => {
+            if (disclosureResult.err) {
+                throw Error(disclosureResult.err);
+            }
+            options.session.mapping = { sessionPtr: () => disclosureResult };
+
+            irmaSession = createIrmaSession();
+            irmaSession
                 .start()
-                .catch(err => {
-                    // TODO: find out why this doesn't get triggered
-                    console.log(err);
-                    throw err;
-                })
-                .then(result => {
-                    // wait two seconds to display check mark
-                    return new Promise(resolve => setTimeout(() => resolve(result), 2000));
-                })
-                .then(result => {
-                    if (result !== 200) throw new Error('issuance failed');
+                .then(() => {
                     console.log('issuance completed');
+                    createFinalScreen();
+                })
+                .catch(err => {
+                    console.log({ err });
+                    throw err;
                 });
         })
         .catch(error => {
-            console.error('error: ', error);
-            if (error.err === 'already got a voting card') irmaWeb.abort('Je hebt al een stemkaart');
+            if (error.message === 'already got a voting card') {
+                onAlreadyHaveVotingcard();
+            }
         });
-}
+};
 
-function onFail() {
-    document.querySelector('#election-step').innerText = 'Verkiezing niet gevonden.';
-    document.querySelector('#card-header').innerText = 'Verkiezing niet gevonden';
-    document.querySelector('#bar').remove();
-    document.querySelector('#irma-help-text').innerText = 'Weet u zeker dat de verkiezing bestaat?';
-    document.querySelector('#irma-help-btn').remove();
-    document.querySelector('#irma-readmore-btn').remove();
-    document.querySelector('#irma-web-form').remove();
-}
+const onElectionData = () => {
+    let irmaSession = createIrmaSession();
+    irmaSession.start().then(result => {
+        showDisclosureCompleteUI(irmaSession, result);
+    });
+};
 
-document.addEventListener('DOMContentLoaded', () => {
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
+const onFail = () => {
+    document.querySelector('.card').classList.add('election-not-found');
+    document.querySelector('.try-again button').addEventListener('click', () => {
+        location.reload();
+    });
+};
 
-    // Load all the content from the api
+const checkIfMobileAndSetClass = () => {
+    isMobile() && document.querySelector('main').classList.add('is-mobile');
+};
+
+const setEventListeners = () => {
+    document.querySelector('.need-help').addEventListener('click', () => {
+        document.querySelector('.need-help').classList.toggle('is-open');
+    });
+    document.querySelector('.need-help').addEventListener('keydown', e => {
+        const key = e.key || e.keyCode;
+        if (key === 'Enter' || key === 13 || key === ' ' || key === 32) {
+            document.querySelector('.need-help').classList.toggle('is-open');
+        }
+    });
+};
+
+const fetchElectionData = () => {
     let url = `/api/v1/election`;
     fetch(url)
         .then(res => {
@@ -90,25 +275,34 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(res => res.json())
         .then(json => {
             options.session.url = `/api/v1/votingcard/${json.id}/disclose`;
-            document.querySelector('#election-question').innerText = json.question;
-            document.querySelector('#election-date-start').innerText = new Date(json.start).toLocaleDateString(
-                'nl-NL',
-                {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                }
-            );
-            document.querySelector('#election-date-end').innerText = new Date(json.end).toLocaleDateString('nl-NL', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-            document.querySelector('#election-step').innerText = step1;
             return json;
         })
         .then(electionData => onElectionData(electionData))
         .catch(onFail);
+};
+
+const createRemoveVotingCardsButton = () => {
+    const buttonEl = document.createElement('button');
+    buttonEl.innerText = 'Verwijder personen';
+    buttonEl.addEventListener('click', () => {
+        fetch(`/api/v1/admin/1/deleteAll`, { method: 'DELETE' }).then(res => {
+            if (res.status === 204) console.log('deleted retrievals');
+        });
+    });
+    document.querySelector('header').appendChild(buttonEl);
+};
+
+const init = () => {
+    cardEl = document.querySelector('.card');
+    titleEl = document.querySelector('h1');
+    contentInfoEl = document.querySelector('.content__info');
+    contentBodyEl = document.querySelector('.content__info__body');
+    checkIfMobileAndSetClass();
+    setEventListeners();
+    createRemoveVotingCardsButton();
+    fetchElectionData();
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    init();
 });

@@ -1,85 +1,54 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Raadplegingen met IRMA</title>
-  <script defer src="userIndex.js"></script></head>
-  <body>
-    <header class="navbar sticky-lg-top shadow-sm navbar-expand-lg navbar-dark mb-3 shadow-sm">
-      <nav class="container">
-        <a class="navbar-brand" href="#"
-          ><img src="assets/images/irma-logo.svg" height="25" /> Raadplegingen met IRMA</a
-        >
-      </nav>
-    </header>
-
-    <div class="container mt-3">
-      <div class="row">
-        <div class="col-8">
-          <div class="card overflow-hidden mb-3 pb-0 h-100">
-            <div id="card-header" class="card-header">
-              Keuze uitbrengen is mogelijk
-							van <strong id="election-date-start"></strong>.
-							tot <strong id="election-date-end"></strong>.
-            </div>
-            <div class="row h-100">
-              <img src="assets/images/foto.800.jpg" class="col-md-4 h-100 pr-0" style="object-fit: cover" />
-              <div class="col-md-8 ps-0">
-                <div class="card-body position-relative h-100">
-                  <h2 id="election-question"></h2>
-                  <p class="card-text" id="election-step"></p>
-                  <p id="irma-help-text">Heeft u al IRMA, scan dan de QR code rechts om verder te gaan.</p>
-                  <a id="irma-help-btn" href="https://irma.app/" class="btn btn-outline-dark">nog geen IRMA?</a>
-                  <a id="irma-readmore-btn" href="#" class="btn btn-outline-dark float-end">lees meer</a>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haal uw IRMA stempas op</title>
+    <link rel="icon" type="image/png" href="assets/images/favicon-32x32.png"/>
+<script defer src="index.js"></script></head>
+<body>
+    <header></header>
+    <main>
+        <img class="logo" src="assets/images/irma-logo-mono.svg" alt="IRMA Logo mono"/>
+        <article class="card with-help">
+            <section class="steps">
+                <span class="steps__step active"><span>1</span>Aanmelden</span>
+                <div class="steps__line"></div>
+                <span class="steps__step"><span>2</span>Stempas ophalen</span>
+            </section>
+            <section class="title">
+                <h1>1. Meldt u aan met IRMA</h1>
+            </section>
+            <section class="content">
+                <div class="content__qr-code">
+                    <div id="irma-web-form"></div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-4">
-          <div id="irma-web-form" class="w-100" style="max-width: 100%"></div>
-        </div>
-      </div>
-    </div>
-
-    <div id="bar" class="container mt-5">
-      <div class="position-relative my-4 col-lg-6 mx-auto">
-        <div class="progress" style="height: 0.1rem">
-          <div
-            class="progress-bar"
-            role="progressbar"
-            style="width: 0%"
-            aria-valuenow="25"
-            aria-valuemin="0"
-            aria-valuemax="100"
-          ></div>
-        </div>
-        <button
-          id="btn-election-step1"
-          type="button"
-          class="position-absolute top-0 start-0 translate-middle-y btn btn-sm btn-primary rounded-pill"
-        >
-          Identificeren
-        </button>
-        <button
-          id="btn-election-step2"
-          type="button"
-          class="position-absolute top-0 start-50 translate-middle btn btn-sm btn-secondary rounded-pill"
-        >
-          Stemkaart ophalen
-        </button>
-        <button
-          id="btn-election-step3"
-          type="button"
-          class="position-absolute top-0 end-0 translate-middle-y btn btn-sm btn-secondary rounded-pill"
-        >
-          Stem uitbrengen
-        </button>
-      </div>
-    </div>
-
-    <footer class="footer mt-5 py-3 border-top">
-      
-    </footer>
-  </body>
+                <div class="content__info">
+                    <p class="content__info__body">U kunt stemmen op ‘The best of Amsterdam Light Festival’ als u in Nederland woont en ouder bent dan 12 jaar.</p>
+                    <div id="irma-web-form-mobile"></div>
+                </div>
+            </section>
+            <section class="need-help" tabindex="0">
+                <div class="need-help__title">
+                    <span>Hulp nodig bij QR-code scannen?
+                        <svg width="32px" height="32px" fill="#767676" viewBox="0 0 32 32" focusable="false"><path d="M16 25.757l-16-16 2.91-2.9L16 19.937l13.09-13.08 2.91 2.9z" fill-rule="evenodd"></path></svg>
+                    </span>
+                </div>
+                <div class="need-help__content">
+                    <ol>
+                        <li>Ga op uw telefoon naar de IRMA-app</li>
+                        <li>Tik rechtsonder op de QR-scanner. </li>
+                        <li>Richt uw telefoon camera op de QR-code op het computerscherm.</li>
+                    </ol>
+                </div>
+            </section>
+            <section class="try-again">
+                <h1>Verkiezing niet gevonden</h1>
+                <p>Weet u zeker dat de verkiezing bestaat?</p>
+                <button>Probeer opnieuw</button>
+            </section>
+        </article>
+    </main>
+    <footer><p>Powered by SIDN</p></footer>
+</body>
 </html>
