@@ -2,6 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const webpack = require('webpack');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 
 // Specified to public path of backend
 outputA = path.resolve(process.cwd(), '../backend/public');
@@ -9,7 +10,6 @@ outputA = path.resolve(process.cwd(), '../backend/public');
 /// Common configuration for serverA and serverB
 var config = {
     mode: 'development',
-    experiments: { asset: true },
     module: {
         rules: [
             {
@@ -50,17 +50,17 @@ var config = {
         new webpack.ProvidePlugin({
             $: 'jquery',
             jQuery: 'jquery'
-        })
+        }),
+        new NodePolyfillPlugin()
     ]
 };
 
 var serverAConfig = Object.assign({}, config, {
     name: 'serverA',
     entry: {
-        userIndex: './user/index.js',
-        adminIndex: './admin/index.js',
-        login: './admin/login.js',
-        election: './admin/election.js'
+        index: './src/user/index.js',
+        'admin/index': './src/admin/index.js',
+        'admin/login': './src/admin/login.js'
     },
     output: {
         path: outputA,
@@ -71,23 +71,18 @@ var serverAConfig = Object.assign({}, config, {
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             filename: 'index.html',
-            template: './user/index.html',
-            chunks: ['userIndex']
+            template: './src/user/index.html',
+            chunks: ['index']
         }),
         new HtmlWebpackPlugin({
             filename: 'admin/index.html',
-            template: './admin/index.html',
-            chunks: ['adminIndex']
+            template: './src/admin/index.html',
+            chunks: ['admin/index']
         }),
         new HtmlWebpackPlugin({
             filename: 'admin/login.html',
-            template: './admin/login.html',
-            chunks: ['login']
-        }),
-        new HtmlWebpackPlugin({
-            filename: 'admin/election.html',
-            template: './admin/election.html',
-            chunks: ['election']
+            template: './src/admin/login.html',
+            chunks: ['admin/login']
         })
     ])
 });

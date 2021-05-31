@@ -1,0 +1,367 @@
+@import 'normalize.css';
+
+:root {
+    --main-bg-color: #004699;
+    --main-border-color: #767676;
+    --grid-gap: 32px;
+    --grid-gap-mobile: 25px;
+  }
+
+h1, h2 {
+    margin: 0;
+}
+
+h1 {
+    font-size: 36px;
+    .is-mobile & {
+        font-size: 30px;
+    }
+}
+
+h2 {
+    .is-mobile & {
+        font-size: 18px;
+    }
+}
+
+p {
+    font-size: 16px;
+    line-height: 25px;
+}
+
+
+.primary-button {
+    padding: 14px;
+    border-radius: 8px;
+    background-color: var(--main-bg-color);
+    color: white;
+    font-weight: bold;
+    border: 0;
+}
+
+body {
+    display: grid;
+    grid-template-rows: 60px 1fr 60px;
+    height: 100%;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    @media (min-width: 768px) {
+        grid-template-rows: 80px 1fr 80px;
+    }
+}
+
+main {
+    position: relative;
+    width: 100%;
+    background: center / cover no-repeat url('../assets/images/abstract.svg');
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &.is-mobile {
+        width: calc(100% - 30px);
+        padding-right: 15px;
+        padding-left: 15px;
+        background-image: url('../assets//images//mobile.svg');
+        .content {
+            grid-template-columns: auto;
+            &__qr-code {
+                display: none;
+            }
+        }
+        .content__info {
+            #irma-web-form-mobile{
+                display: block;
+                width: auto;
+                height: auto;
+                min-height: auto;
+                & .irma-web-header {
+                    display: none;
+                }
+                & .irma-web-content {
+                    margin: 0;
+                    justify-content: flex-start;
+                }
+                & .irma-web-button-link {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    color: white;
+                    text-decoration: none;
+                    &:before {
+                        content: url('../assets/images/irma-logo.svg');
+                        position: absolute;
+                        width: 30px;
+                        height: 27px;
+                        left: 14px;
+                    }
+                    & + p {
+                        display: none;
+                    }
+                    button {
+                        padding: 14px 14px 14px 50px;
+                        border: none;
+                        border-radius: 8px;
+                        box-shadow: none;
+                    }
+                } 
+            }
+        }
+    }
+}
+
+.logo {
+    position: absolute;
+    left: 50%;
+    top: -66px;
+    transform: translateX(-50%);
+    width: 160px;
+    height: 132px;
+    .is-mobile & {
+        width: 140px;
+        height: 100px;
+        top: -50px;
+    }
+}
+
+.card {
+    display: grid;
+    grid-gap: var(--grid-gap-mobile);
+    max-width: 730px;
+    background-color: white;
+    padding: 55px;
+    border-radius: 70px;
+    overflow: hidden;
+    @media (min-width: 768px) {
+        grid-gap: var(--grid-gap);
+    }
+    @media (min-width: 1024px) {
+        min-width: 730px;
+        min-height: 400px;
+    }
+    &.with-help {
+        padding: 55px 55px 0 55px;
+    }
+    .is-mobile & {
+        border-radius: 30px;
+        padding: 25px;
+    }
+    #irma-web-form-mobile {
+        display: none;
+    }
+    .try-again {
+        display: none;
+    }
+    &.election-not-found {
+        section:not(.try-again) {
+            display: none;
+        }
+        .try-again {
+            display: block;
+        }
+    }
+    .content {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        grid-gap: var(--grid-gap-mobile);;
+        p {
+            margin: 0 0 var(--grid-gap-mobile) 0;
+        }
+    
+    }
+    .final__paragraph p {
+        margin: 0;
+    }
+    .linkBtn {
+        @extend .primary-button;
+        display: inline-block;
+        text-decoration: none;
+    }
+    &.final {
+        align-content: flex-start;
+    }
+}
+
+.steps {
+    display: none;
+    @media (min-width: 768px) {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        &__step {
+            position: relative;
+            color: var(--main-border-color);
+            border: 1px solid var(--main-border-color);
+            border-radius: 15px;
+            padding: 5px 15px 5px 36px;
+            & > span {
+                position: absolute;
+                top: -1px;
+                left: -1px;
+                margin-right: 5px;
+                padding: 5px 10px;
+                border: 1px solid white;
+                border-color: var(--main-border-color);
+                border-radius: 50%;
+            }
+            &.active {
+                border-color: var(--main-bg-color);
+                background-color: var(--main-bg-color);
+                color: white;
+                & > span {
+                    top: -2px;
+                    left: -1px;
+                    border-color: white;
+                    border-width: 2px;
+                    background-color: var(--main-bg-color);
+                    color: white;
+                }
+            }
+            &.done {
+                color: var(--main-bg-color);
+                border-color: var(--main-bg-color);
+                border-radius: 15px;
+                & > span {
+                    border-width: 1px;
+                    border-color: var(--main-bg-color);
+                }
+                & + .steps__line {
+                    background-color: var(--main-bg-color);
+                }
+            }
+        }
+        &__line {
+            flex-grow: 2;
+            height: 1px;
+            background-color: var(--main-border-color);
+        }
+    }
+}
+
+.need-help {
+    transition: .3s ease;
+    .is-mobile & {
+        display: none;
+    }
+    max-height: 68px;
+    color: var(--main-border-color);
+    &__content {
+        visibility: hidden;
+        padding: 25px 0;
+        ol {
+            margin: 0;
+            list-style: none;
+            counter-reset: li;
+            li {
+                counter-increment: li;
+                &:not(:last-child) {
+                    padding-bottom: 12px;
+                }
+                &::before {
+                    margin-right: 10px;
+                    padding: 4px 8px;
+                    border-radius: 50%;
+                    content: counter(li);
+                    background-color: #EEECEC;
+                }
+                &:first-child {
+                    &:before {
+                        padding: 4px 9px;
+                    }
+                }
+            }
+        }
+    }
+    &__title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 -55px;
+        padding: 25px 0;
+        background: #EEECEC;
+        span {
+            cursor: pointer;
+        }
+        svg {
+            width: 16px;
+            height: 16px;
+            vertical-align: bottom;
+            transition: .3s ease;
+            .is-open & {
+                transform: rotate(180deg);
+            }
+        }
+    }
+    
+    &.is-open {
+        max-height: 200px;
+        .need-help__content {
+            visibility: visible;
+        }
+        .need-help__arrow {
+            transform: rotate(180deg);
+        }
+    }
+}
+
+#irma-web-form {
+    width: 230px;
+    min-width: auto;
+    max-width: none;
+    height: 230px;
+    min-height: auto;
+    & .irma-web-header {
+        display: none;
+    }
+    & .irma-web-content {
+        position: relative;
+        margin: 0;
+        justify-content: start;
+        & .irma-web-centered {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            &.show-logo:after {
+                content: url('../assets/images/irma-logo.svg');
+                position: absolute;
+                width: 65px;
+                height: 65px;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+        }
+    }
+    .irma-web-checkmark-animation {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        border: 1px solid #2bc194;
+        border-radius: 17px;
+        &:before {
+            content: '';
+            position: absolute;
+            width: 70%;
+            height: 70%;
+            background: center / cover no-repeat url("data:image/svg+xml,%3Csvg%20width%3D%22120%22%20height%3D%22120%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M60%200C26.863%200%200%2026.863%200%2060s26.863%2060%2060%2060%2060-26.863%2060-60C119.961%2026.879%2093.121.039%2060%200zm34.635%2041L60.41%2087.445a5.055%205.055%200%2001-7.15.94l-24.44-19.54a5.001%205.001%200%20016.25-7.81L55.45%2077.34l31.135-42.255A5%205%200%201194.635%2041z%22%20fill%3D%22%23029B17%22%20fill-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E");
+            border: none;
+            transform: none;
+            animation: none;
+        }
+        & + p {
+            display: none;
+        }
+      }
+}
+
+#remove-retrievals {
+    display: none;
+}
+
+footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: hsl(209, 100%, 29%);
+}

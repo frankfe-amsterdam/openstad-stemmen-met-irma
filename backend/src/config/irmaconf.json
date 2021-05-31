@@ -1,0 +1,15 @@
+{
+  "production": false,
+  "url": "",
+  "port": 8089,
+  "sse": true,
+  "email": "f.filius@amsterdam.nl",
+  "disclose_perms": [
+    "irma-demo.gemeente.personalData.*",
+    "irma-demo.gemeente.address.zipcode",
+    "pbdf.sidn-pbdf.email.email"
+  ],
+  "issue_perms": ["irma-demo.stemmen.stempas"],
+  "sign_perms": [],
+  "no_auth": true
+}
